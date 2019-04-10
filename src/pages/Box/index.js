@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import api from '../../services/api';
 
 import { MdInsertDriveFile } from 'react-icons/md'
 
@@ -6,31 +7,34 @@ import logo from "../../assets/logo.svg"
 import './styles.css';
 
 export default class Box extends Component {
+  state = { box: {} }
+
+  async componentDidMount() {
+    const box = this.props.match.params.id
+    const response = await api.get(`boxes/${box}`)
+
+    this.setState({ box: response.data })
+  }
+
   render() {
     return (
       <div id="box-container">
       <header>
         <img src={logo} alt="RocketBox"/>
-        <h1>Rocketseat</h1>
+        <h1>{ this.state.box.title }</h1>
       </header>
 
       <ul>
-        <li>
-          <a className="fileInfo" href="">
-            <MdInsertDriveFile size={24} color="#a5cfff" />
-            <strong>Desafio.pdf</strong>
-          </a>
+        { this.state.box.files && this.state.box.files.map( file => (
+          <li>
+            <a className="fileInfo" href={file.url} target="_blank">
+              <MdInsertDriveFile size={24} color="#a5cfff" />
+              <strong>{file.title}</strong>
+            </a>
 
-          <span>há 3 minutos atrás</span>
-        </li>
-        <li>
-          <a className="fileInfo" href="">
-            <MdInsertDriveFile size={24} color="#a5cfff" />
-            <strong>Desafio.pdf</strong>
-          </a>
-
-          <span>há 3 minutos atrás</span>
-        </li>
+            <span>{file.createdAt}</span>
+          </li>
+        )) }
       </ul>
     </div>
     );
